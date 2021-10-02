@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小連小吃部菜單系統</title>
+  <script src="https://unpkg.com/vue@next"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="app">
+    <section class="hero is-success">
+      <div class="hero-body">
+        <p class="title">
+          小連小吃部
+        </p>
+        <p class="subtitle">
+          請點菜
+        </p>
+      </div>
+    </section>
+
+    <section class="food section">
+      <h1 class="title">要吃甚麼？</h1>
+
+      <div class="control">
+        <label class="radio pr-2" v-for="item in menu" :key="item.food">
+          <input type="radio" name="food" @click="selectFood(item)">
+          {{ item.food }}
+          <span class="pl-2">{{ item.price }}$</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="option section">
+      <h1 class="title">料理選項</h1>
+      <div class="control">
+        <template v-if="!options">
+          <div>
+            請選擇
+          </div>
+        </template>
+        <template v-for="option in options" :key="option">
+          <div v-if="options.length <= 1">
+            不用選
+          </div>
+          <div v-else>
+            <label class="radio">
+              <input type="radio" name="option" @click="selectOption(option)">
+              {{ option }}
+            </label>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <section class="submit section">
+      <h1 class="title">點好了嗎？</h1>
+      <div class="constrol">
+        <button class="submit" @click="submit">我點好了</button>
+      </div>
+    </section>
+  </div>
+
+
+  <script src="./menuData.js"></script>
+  <script>
+
+    function initFood() {
+      let newMenuData = [];
+      // 為了把牛肉相關的料理整合成一筆資料
+      // 一開始拿到資料就要先處理
+      newMenuData = menuData.map(item => {
+        let foodData = {
+          food: item.food,
+          price: item.price,
+          options: item.options
+        }
+
+        if (foodData.food === "牛肉料理") {
+          let beefDishes = menuData.filter(item => item.food === "牛肉料理")[0]
+          let beefSoup = menuData.filter(item => item.food === "牛肉湯")[0]
+
+          // 1. 把牛肉湯放到牛肉料理的選項
+          foodData.options.push(beefSoup.food)
+          // 料理選牛肉料理，選項選牛肉湯，我們要用牛肉湯的價格來計算
+          // 2. 在牛肉料理的資料中加入切換資料的 function
+          foodData.changeData = function (option) {
+            let price = option === beefSoup.options[0] ? beefSoup.price : beefDishes.price
+            this.price = price
+          }
+        }
+
+        return foodData
+      })
+
+      // 3. 把牛肉湯從料理移除
+      newMenuData = newMenuData.filter(item => item.food !== "牛肉湯")
+
+      return newMenuData
+    }
+
+    Vue.createApp({
+      setup() {
+        const menu = Vue.ref([])
+
+        const options = Vue.computed(() => {
+          return selectedFood.value.options
+        })
+
+        let selectedFood = Vue.ref({})
+
+        let selectedOption = Vue.ref('')
+
+        const selectFood = (item) => {
+          selectedFood.value = item
+          selectedOption.value = item.options.length <= 1 ? item.options[0] : ''
+        }
+
+        const selectOption = (option) => {
+          // 如果選擇的料理有取得價格就執行它
+          if (selectedFood.value.changeData) {
+            selectedFood.value.changeData(option)
+          }
+          selectedOption.value = option
+        }
+
+        Vue.onMounted(function () {
+          menu.value = initFood()
+        })
+
+        const submit = () => {
+          let order = {
+            food: selectedFood.value.food,
+            price: selectedFood.value.price,
+            option: selectedOption.value
+          }
+
+          let text = `您選了${order.food}，選項為${order.option}，價格是${order.price}元`
+
+          if (!order.food) {
+            text = `沒有這個料理`
+          }
+
+          if (!order.price) {
+            text = `價格錯誤`
+          }
+
+          if (!order.option) {
+            text = `請正確選擇料理選項`
+          }
+
+          alert(text)
+        }
+
+
+        return {
+          menu,
+          options,
+          selectedFood,
+          selectFood,
+          selectedOption,
+          selectOption,
+          submit
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
