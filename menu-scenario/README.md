@@ -29,7 +29,7 @@ const menuData = [
 ]
 
 ```
-[Code](https://github.com/BolasLien/my-example/menu-scenario/blob/master/version1.html)
+[Code](https://github.com/BolasLien/my-example/blob/master/menu-scenario/version1.html)
 [Demo](https://bolaslien.github.io/my-example/menu-scenario/version1)
 
 ---
@@ -49,5 +49,5 @@ const menuData = [
   - 效果：選擇牛肉料理選項的時候，用來切換牛肉湯的價格
 
 
-[Code](https://github.com/BolasLien/my-example/menu-scenario/blob/master/version1.html)
+[Code](https://github.com/BolasLien/my-example/blob/master/menu-scenario/version2.html)
 [Demo](https://bolaslien.github.io/my-example/menu-scenario/version2)
